@@ -15,6 +15,9 @@ export const Goods: React.FC<GoodsProps> = ({ goods }) => {
   const [isReversed, setIsReversed] = useState(false);
   const [currentGoods, setCurrentGoods] = useState<string[]>([...goods]);
 
+  // Build a map of original indices (for stable keys)
+  const originalIndexMap = new Map(goods.map((g, i) => [g, i]));
+
   const handleSort = (type: SortType) => {
     setSortType(type);
 
@@ -28,17 +31,10 @@ export const Goods: React.FC<GoodsProps> = ({ goods }) => {
       case SortType.Length:
         sorted = [...goods].sort((a, b) => {
           if (a.length === b.length) {
-            if (a === 'Carrot') {
-              return -1;
-            }
-
-            if (b === 'Carrot') {
-              return 1;
-            }
-
+            if (a === 'Carrot') return -1;
+            if (b === 'Carrot') return 1;
             return goods.indexOf(a) - goods.indexOf(b);
           }
-
           return a.length - b.length;
         });
         break;
@@ -57,8 +53,8 @@ export const Goods: React.FC<GoodsProps> = ({ goods }) => {
   };
 
   const handleReverse = () => {
-    setIsReversed(prev => !prev);
-    setCurrentGoods(prevGoods => [...prevGoods].reverse());
+    setIsReversed((prev) => !prev);
+    setCurrentGoods((prevGoods) => [...prevGoods].reverse());
   };
 
   const handleReset = () => {
@@ -100,8 +96,8 @@ export const Goods: React.FC<GoodsProps> = ({ goods }) => {
       </div>
 
       <ul className="goods-list">
-        {currentGoods.map(item => (
-          <li key={item}>{item}</li>
+        {currentGoods.map((item) => (
+          <li key={`${item}-${originalIndexMap.get(item)}`}>{item}</li>
         ))}
       </ul>
     </section>
